@@ -1,0 +1,45 @@
+<body>
+  <h1>Link Demo</h1>
+  <div id="tokens">
+    <p>Link Token: <%= @link_token %></p>
+  </div>
+
+  <button id="open-link-button">Start linking</button>
+  <script src="https://cdn.merge.dev/initialize.js"></script>
+  <script type="text/javascript">
+    const button = document.getElementById("open-link-button");
+    button.disabled = true;
+
+    async function onSuccess(public_token) {
+        let el = document.createElement('p')
+        el.append(`Public Token: ${public_token}`)
+        document.querySelector("#tokens").append(el)
+
+        const response = await fetch("/account-key", {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(public_token)
+          }
+        )
+        const json = await response.json()
+        el = document.createElement('pre')
+        el.append(JSON.stringify(json))
+        document.querySelector("#tokens").append(el)
+    }
+
+    MergeLink.initialize({
+      linkToken: "<%= @link_token %>",
+      onSuccess: (public_token) => onSuccess(public_token),
+      onReady: () => (button.disabled = false),
+      <% if @is_tenant %>
+      tenantConfig: { apiBaseURL: "https://<%= @api_url %>" },
+      <% end %>
+    });
+
+    button.addEventListener("click", function () {
+      MergeLink.openLink();
+    });
+  </script>
+</body>

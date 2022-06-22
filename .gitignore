@@ -1,0 +1,5 @@
+vendor/
+Gemfile.local*
+shell.nix
+.bundle/
+.ruby-version
